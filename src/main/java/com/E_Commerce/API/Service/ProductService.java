@@ -4,9 +4,11 @@ import com.E_Commerce.API.Dto.ProductRequest;
 import com.E_Commerce.API.Dto.ProductResponse;
 import com.E_Commerce.API.Entity.ProductModel;
 import com.E_Commerce.API.Repository.ProductRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +38,13 @@ public class ProductService {
 
     public void deleteProduct(Long productId) {
         ProductModel product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
         productRepository.delete(product);
     }
 
     public ProductResponse getProduct(Long productId) {
         ProductModel product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
         return new ProductResponse(product.getProductName(),
                 product.getProductDescription(),
                 product.getProductBrand(),
@@ -54,7 +56,7 @@ public class ProductService {
 
     public ProductResponse updateProduct(ProductRequest productRequest, Long productId) {
         ProductModel product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
         if (productRequest.getProductName() != null) {
             product.setProductName(productRequest.getProductName());
         }

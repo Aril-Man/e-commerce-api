@@ -5,6 +5,7 @@ import com.E_Commerce.API.Dto.UserRequestLogin;
 import com.E_Commerce.API.Dto.UserResponse;
 import com.E_Commerce.API.Entity.UserModel;
 import com.E_Commerce.API.Repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import com.E_Commerce.API.Entity.CartModel;
 import com.E_Commerce.API.Repository.CartRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class UserService {
         UserModel userEmail = userRepository.findByEmail(request.getEmail());
         UserModel userUserName = userRepository.findByUserName(request.getUserName());
         if (userEmail != null || userUserName != null) {
-            throw new RuntimeException("User already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exists");
         }
 
         // Create a new user
@@ -63,7 +65,7 @@ public class UserService {
         String password = (request.password());
         UserModel user = userRepository.findByEmail(email);
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
         String jwtToken = jwtUtils.generateToken(email);
 

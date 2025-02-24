@@ -8,6 +8,7 @@ import com.E_Commerce.API.Dto.OrderResponse;
 import com.E_Commerce.API.Dto.Status;
 import com.E_Commerce.API.Entity.OrderModel;
 import com.E_Commerce.API.Repository.OrderRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.E_Commerce.API.Entity.CartItem;
@@ -16,6 +17,7 @@ import com.E_Commerce.API.Repository.CartRepository;
 import com.E_Commerce.API.Entity.ProductModel;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class OrderService {
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
         CartModel cart = cartRepository.findById(orderRequest.getCartId())
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
         List<ProductModel> products = cart.getItems().stream()
                 .map(CartItem::getProduct)
                 .toList();
@@ -65,7 +67,7 @@ public class OrderService {
 
     public void deleteOrder(Long orderId) {
         OrderModel order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
         order.setStatus(Status.CANCELLED);
         orderRepository.save(order);
     }
