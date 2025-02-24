@@ -1,7 +1,9 @@
 package com.E_Commerce.API.Controller;
 
 import com.E_Commerce.API.Dto.*;
+import com.E_Commerce.API.Entity.ProductModel;
 import com.E_Commerce.API.Entity.UserModel;
+import com.E_Commerce.API.Repository.ProductRepository;
 import com.E_Commerce.API.Repository.UserRepository;
 import com.E_Commerce.API.Service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +32,9 @@ class ProductControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     Faker faker = new Faker();
 
@@ -83,6 +88,8 @@ class ProductControllerTest {
     @Test
     void updateProductSuccess() throws Exception {
 
+        Long productId = productRepository.findLastId();
+
         UserResponse userResponse = userService.login(new UserRequestLogin("jolynn.klocko@yahoo.com", "password"));
 
         ProductRequest request = new ProductRequest();
@@ -95,7 +102,7 @@ class ProductControllerTest {
         request.setProductStock(Integer.valueOf(faker.number().numberBetween(1, 100)));
 
         mockMvc.perform(
-                put("/api/v1/product/update/1")
+                put("/api/v1/product/update/" + productId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -107,6 +114,8 @@ class ProductControllerTest {
     @Test
     void updateProductUnauthorized() throws Exception {
 
+        Long productId = productRepository.findLastId();
+
         ProductRequest request = new ProductRequest();
         request.setProductName(faker.commerce().productName());
         request.setProductPrice(Double.valueOf(faker.commerce().price()));
@@ -117,7 +126,7 @@ class ProductControllerTest {
         request.setProductStock(Integer.valueOf(faker.number().numberBetween(1, 100)));
 
         mockMvc.perform(
-                put("/api/v1/product/update/1")
+                put("/api/v1/product/update/" + productId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
@@ -128,10 +137,11 @@ class ProductControllerTest {
     @Test
     void getProductSuccess() throws Exception {
 
+        Long productId = productRepository.findLastId();
         UserResponse userResponse = userService.login(new UserRequestLogin("jolynn.klocko@yahoo.com", "password"));
 
         mockMvc.perform(
-                get("/api/v1/product/get/1")
+                get("/api/v1/product/get/" + productId)
                         .accept(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + userResponse.token())
         ).andDo(MockMvcResultHandlers.print())
@@ -142,5 +152,28 @@ class ProductControllerTest {
                             assertNotNull(response);
                         }
                 );
+    }
+
+    @Test
+    void getProductUnauthorized() throws Exception {
+        Long productId = productRepository.findLastId();
+
+        mockMvc.perform(
+                get("/api/v1/product/get/" + productId)
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deleteProductSuccess() throws Exception {
+        Long productId = productRepository.findLastId();
+        UserResponse userResponse = userService.login(new UserRequestLogin("jolynn.klocko@yahoo.com", "password"));
+        mockMvc.perform(
+                delete("/api/v1/product/delete/" + productId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + userResponse.token())
+        ).andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isNoContent());
     }
 }
