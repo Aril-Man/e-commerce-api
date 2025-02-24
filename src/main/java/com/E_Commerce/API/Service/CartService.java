@@ -8,6 +8,7 @@ import com.E_Commerce.API.Dto.CartResponse;
 import com.E_Commerce.API.Entity.CartItem;
 import com.E_Commerce.API.Entity.CartModel;
 import com.E_Commerce.API.Repository.CartRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.E_Commerce.API.Entity.ProductModel;
@@ -15,6 +16,7 @@ import com.E_Commerce.API.Repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,13 +27,13 @@ public class CartService {
         @Transactional
         public CartResponse addItem(CartItemRequest cartItemRequest) {
                 CartModel cart = cartRepository.findById(cartItemRequest.getCartId())
-                                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
 
                 ProductModel productModel = productRepository.findById(cartItemRequest.getProductId())
-                                .orElseThrow(() -> new RuntimeException("Product not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
                 if (cartItemRequest.getQuantity() > productModel.getProductStock()) {
-                        throw new RuntimeException("Requested quantity exceeds available stock");
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Requested quantity exceeds available stock");
                 }
                 CartItem existingCartItem = cart.getItems().stream()
                                 .filter(cartItem -> cartItem.getProduct().getProductNumber()
@@ -76,7 +78,7 @@ public class CartService {
 
         public CartResponse getCart(Long cartId) {
                 CartModel cart = cartRepository.findById(cartId)
-                                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
                 List<CartItemResponse> items = cart.getItems().stream().map(
                                 cartItem -> new CartItemResponse(
                                                 cartItem.getProduct().getProductNumber(),
@@ -95,15 +97,15 @@ public class CartService {
         @Transactional
         public CartResponse removeItem(Long cartId, Long productId) {
                 CartModel cart = cartRepository.findById(cartId)
-                                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart not found"));
 
                 ProductModel productModel = productRepository.findById(productId)
-                                .orElseThrow(() -> new RuntimeException("Product not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
                 CartItem cartItemPresent = cart.getItems().stream()
                                 .filter(item -> item.getProduct().getProductNumber().equals(productId))
                                 .findFirst()
-                                .orElseThrow(() -> new RuntimeException("Item not found"));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
                 cartItemPresent.setQuantity(cartItemPresent.getQuantity() - 1);
                 productModel.setProductStock(productModel.getProductStock() + 1);
                 if (cartItemPresent.getQuantity() == 0) {
