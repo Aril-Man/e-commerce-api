@@ -22,7 +22,7 @@ import lombok.Setter;
 @Builder
 public class PaymentModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String userId;
     @OneToMany(cascade = CascadeType.ALL)

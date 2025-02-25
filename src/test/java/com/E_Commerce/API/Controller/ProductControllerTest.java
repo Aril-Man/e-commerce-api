@@ -41,7 +41,7 @@ class ProductControllerTest {
     @Test
     void createProductSuccess() throws Exception {
 
-        UserResponse userResponse = userService.login(new UserRequestLogin("jolynn.klocko@yahoo.com", "password"));
+        UserResponse userResponse = userService.login(new UserRequestLogin("valarie.gislason@yahoo.com", "password"));
 
         System.out.println(userResponse);
 
@@ -90,7 +90,7 @@ class ProductControllerTest {
 
         Long productId = productRepository.findLastId();
 
-        UserResponse userResponse = userService.login(new UserRequestLogin("jolynn.klocko@yahoo.com", "password"));
+        UserResponse userResponse = userService.login(new UserRequestLogin("valarie.gislason@yahoo.com", "password"));
 
         ProductRequest request = new ProductRequest();
         request.setProductName(faker.commerce().productName());
@@ -138,7 +138,7 @@ class ProductControllerTest {
     void getProductSuccess() throws Exception {
 
         Long productId = productRepository.findLastId();
-        UserResponse userResponse = userService.login(new UserRequestLogin("jolynn.klocko@yahoo.com", "password"));
+        UserResponse userResponse = userService.login(new UserRequestLogin("valarie.gislason@yahoo.com", "password"));
 
         mockMvc.perform(
                 get("/api/v1/product/get/" + productId)
@@ -168,7 +168,7 @@ class ProductControllerTest {
     @Test
     void deleteProductSuccess() throws Exception {
         Long productId = productRepository.findLastId();
-        UserResponse userResponse = userService.login(new UserRequestLogin("jolynn.klocko@yahoo.com", "password"));
+        UserResponse userResponse = userService.login(new UserRequestLogin("valarie.gislason@yahoo.com", "password"));
         mockMvc.perform(
                 delete("/api/v1/product/delete/" + productId)
                         .accept(MediaType.APPLICATION_JSON)

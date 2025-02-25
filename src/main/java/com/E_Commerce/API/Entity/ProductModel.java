@@ -22,7 +22,7 @@ import lombok.Setter;
 @Builder
 public class ProductModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productNumber;
     private String productName;
     private String productDescription;

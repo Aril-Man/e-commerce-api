@@ -96,7 +96,7 @@ class UserControllerTest {
 
     @Test
     void loginSuccess() throws Exception {
-        UserRequestLogin request = new UserRequestLogin("jolynn.klocko@yahoo.com", "password");
+        UserRequestLogin request = new UserRequestLogin("chu.harvey@hotmail.com", "password");
 
         mockMvc.perform(
                 post("/api/v1/user/login")
